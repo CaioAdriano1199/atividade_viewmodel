@@ -1,5 +1,8 @@
 package com.senac.ex01_layout
 
+import android.app.DatePickerDialog
+import android.content.Context
+import android.icu.util.Calendar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -136,7 +139,28 @@ private fun Fields() {
         horizontalArrangement = Arrangement.SpaceBetween
 
     ) {
-        Button(onClick = {}) {
+        Button(onClick = {
+            val calendar = Calendar.getInstance()
+
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePicker = DatePickerDialog(
+                this as Context,
+                { _, selectedYear, selectedMonth, selectedDay ->
+
+                    val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                    println(date) // ou coloca num TextView
+
+                },
+                year,
+                month,
+                day
+            )
+
+            datePicker.show()
+        }) {
             Text(text = stringResource(R.string.choose_date))
         }
         Button(onClick = {}) {
@@ -150,7 +174,7 @@ private fun UILabBottomBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(onClick = {}) {
