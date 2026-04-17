@@ -3,8 +3,11 @@ package viewmodel
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.senac.ex01_layout.db.TaskDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import model.Priority
 import model.Status
 import model.Task
@@ -13,7 +16,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
-class TaskViewModel: ViewModel() {
+class TaskViewModel(private val taskDao: TaskDao): ViewModel() {
 
     private val _state = MutableStateFlow(Task())
 
@@ -43,6 +46,11 @@ class TaskViewModel: ViewModel() {
 
     }
     fun submit(){
+        viewModelScope.launch {
+           val id = taskDao.upsert(_state.value)
+            _state.value = _state.value.copy(id = id.toInt())
+
+        }
 
     }
 }

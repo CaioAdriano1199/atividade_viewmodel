@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,16 +26,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.senac.ex01_layout.db.AppDatabase
 import com.senac.ex01_layout.ui.theme.Ex01LayoutTheme
 import model.Priority
 import model.Status
 import viewmodel.TaskViewModel
+import viewmodel.TaskViewModelFactory
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +54,13 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Layout01() {
+    val taskViewModel: TaskViewModel = viewModel(
+        factory = TaskViewModelFactory(
+            AppDatabase.getDatabase(LocalContext.current).taskDao()
+        )
+    )
     Scaffold(
+
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             UILabBottomBar()
@@ -74,8 +81,12 @@ fun Layout01() {
 }
 
 @Composable
-private fun Fields() {
-    val taskViewModel: TaskViewModel = viewModel()
+private fun Fields(taskViewModel: TaskViewModel = viewModel(
+    factory = TaskViewModelFactory(
+        AppDatabase.getDatabase(LocalContext.current).taskDao()
+    )
+)) {
+
     val state = taskViewModel.uiState.collectAsState()
     val formatodata = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val formatohora = DateTimeFormatter.ofPattern("HH:mm")
@@ -170,7 +181,11 @@ private fun Fields() {
 }
 
 @Composable
-private fun UILabBottomBar() {
+private fun UILabBottomBar( taskViewModel: TaskViewModel = viewModel(
+    factory = TaskViewModelFactory(
+        AppDatabase.getDatabase(LocalContext.current).taskDao()
+    )
+)) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,7 +198,9 @@ private fun UILabBottomBar() {
         Button(onClick = {}) {
             Text(text = stringResource(R.string.reset))
         }
-        Button(onClick = {}) {
+        Button(onClick = {
+            taskViewModel.submit()
+        }) {
             Text(text = stringResource(R.string.submit))
         }
     }
